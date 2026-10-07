@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+
+# Código compilado
+dist/
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+
+# Links de pago reales
+# Si el repositorio es PRIVADO y quieres versionarlos, borra esta línea.
+data/paymentLinks.json
+
+# Logs y archivos del sistema
+*.log
+.DS_Store
+Thumbs.db
