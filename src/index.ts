@@ -1,5 +1,6 @@
 import { createBot } from './bot.ts';
 import { loadConfig } from './config.ts';
+import { startHealthServer } from './servidor.ts';
 import { cleanupDebugScreenshots, createVoucherGenerator } from './services/oxxoVoucher.ts';
 import { scheduleWeeklyTask } from './utils/weeklyCleanup.ts';
 
@@ -8,6 +9,10 @@ const CLEANUP_HOUR = 4;
 const CLEANUP_TIMEZONE = 'America/Mexico_City';
 
 async function main(): Promise<void> {
+    // Render (Web Service) exige un puerto abierto: se abre de inmediato, antes del resto del arranque.
+    // Corre aparte del long polling de Telegram, sin afectarlo.
+    startHealthServer();
+
     const config = loadConfig();
     // Chromium se abre una sola vez al arrancar, así la primera petición no espera a que inicie
     const vouchers = await createVoucherGenerator({ headless: config.headless });

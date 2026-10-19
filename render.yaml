@@ -1,15 +1,13 @@
-# Despliegue en Render como "Background Worker" (NO Web Service: el bot no abre ningún puerto).
-# Render puede leer este archivo al conectar el repo (Blueprint) y crear el servicio solo.
+# Despliegue en Render como Web Service en el plan gratis.
+# El plan gratis exige un puerto abierto: lo cubre el servidor de salud de src/servidor.ts,
+# que responde 200 "OK" en "/" (lo que Render usa como healthCheckPath).
 services:
-  - type: worker
+  - type: web
     name: bot-send-oxxo
     runtime: docker
     dockerfilePath: ./Dockerfile
-    # Chromium necesita RAM. "starter" (512 MB) puede alcanzar con poco uso;
-    # si se cae por memoria, sube a "standard" (2 GB).
-    plan: starter
-    # Una sola instancia: Telegram solo deja un bot leyendo los mensajes a la vez (si no, error 409).
-    numInstances: 1
+    plan: free
+    healthCheckPath: /
     autoDeploy: true
     envVars:
       - key: BOT_TOKEN
@@ -22,3 +20,4 @@ services:
         value: "true"
       - key: LOG_UPDATES
         value: "false"
+    # PORT lo inyecta Render automáticamente; el servidor de salud lo lee (10000 por defecto).

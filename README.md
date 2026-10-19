@@ -117,6 +117,7 @@ Cada falla guarda una captura en `debug/`. Para que no se acumulen, **cada domin
 │   └── paymentLinks.example.json  ← plantilla
 ├── src/
 │   ├── index.ts                   ← punto de entrada: arranque y apagado
+│   ├── servidor.ts                ← servidor HTTP de salud (para el plan gratis de Render)
 │   ├── bot.ts                     ← crea el bot y registra middlewares y handlers
 │   ├── config.ts                  ← lee y valida .env y los links
 │   ├── middlewares/
@@ -139,10 +140,16 @@ Cada falla guarda una captura en `debug/`. Para que no se acumulen, **cada domin
 
 Render con Playwright necesita Docker (el entorno normal no puede instalar Chromium). El repo ya trae `Dockerfile` (imagen oficial de Playwright con Chromium) y `render.yaml`.
 
+Se despliega como **Web Service** en el **plan gratis**. Ese plan exige un puerto abierto, por eso el bot arranca también un pequeño servidor de salud (`src/servidor.ts`) que escucha en `PORT` (10000 por defecto) y responde `200 OK` en `/`. Render lo usa como health check (`healthCheckPath: /`).
+
 1. Sube el repo a GitHub.
-2. En Render crea un **Background Worker** (no un Web Service: el bot no abre ningún puerto) conectado al repo. Si usas el *Blueprint* (`render.yaml`), Render lo configura solo.
-3. En **Environment**, define las variables: `BOT_TOKEN`, `ALLOWED_GROUP_ID` y `PAYMENT_LINKS` (el JSON de los links en una sola línea). `HEADLESS=true`.
-4. Deja **una sola instancia**: Telegram solo permite un bot leyendo los mensajes a la vez (dos darían error `409`). Por lo mismo, apaga el bot de tu PC antes de dejar corriendo el del servidor.
+2. En Render crea un **Web Service** (plan **Free**) conectado al repo, o usa el *Blueprint* (`render.yaml`) y Render lo configura solo.
+3. En **Environment**, define las variables: `BOT_TOKEN`, `ALLOWED_GROUP_ID` y `PAYMENT_LINKS` (el JSON de los links en una sola línea). `HEADLESS=true`. (`PORT` lo pone Render solo.)
+4. Apaga el bot de tu PC antes de dejar corriendo el del servidor: Telegram solo permite un bot leyendo a la vez (dos darían error `409`).
+
+En los logs verás `Página de salud en el puerto 10000` y luego `Your service is live 🎉`.
+
+> **Límites del plan gratis:** 512 MB de RAM (Chromium puede quedarse corto al generar un OXXO) y el servicio se duerme tras ~15 min sin tráfico. Para uso real conviene un plan de pago o un servidor propio.
 
 Para sacar el JSON de una línea desde tu archivo local:
 
