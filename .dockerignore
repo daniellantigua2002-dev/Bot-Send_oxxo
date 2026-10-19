@@ -1,0 +1,15 @@
+# No se copian al contenedor: se reinstalan o recompilan dentro
+node_modules/
+dist/
+
+# Capturas de depuración y secretos locales
+debug/
+.env
+.env.*
+!.env.example
+
+# Git y basura del sistema
+.git/
+*.log
+.DS_Store
+Thumbs.db

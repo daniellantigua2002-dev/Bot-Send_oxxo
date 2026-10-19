@@ -13,6 +13,9 @@ dist/
 # Si el repositorio es PRIVADO y quieres versionarlos, borra esta línea.
 data/paymentLinks.json
 
+# Capturas de depuración cuando falla la generación de un OXXO
+debug/
+
 # Logs y archivos del sistema
 *.log
 .DS_Store

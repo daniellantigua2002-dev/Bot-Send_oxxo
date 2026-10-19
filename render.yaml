@@ -1,0 +1,24 @@
+# Despliegue en Render como "Background Worker" (NO Web Service: el bot no abre ningún puerto).
+# Render puede leer este archivo al conectar el repo (Blueprint) y crear el servicio solo.
+services:
+  - type: worker
+    name: bot-send-oxxo
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Chromium necesita RAM. "starter" (512 MB) puede alcanzar con poco uso;
+    # si se cae por memoria, sube a "standard" (2 GB).
+    plan: starter
+    # Una sola instancia: Telegram solo deja un bot leyendo los mensajes a la vez (si no, error 409).
+    numInstances: 1
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false # se escribe a mano en el panel de Render (secreto)
+      - key: ALLOWED_GROUP_ID
+        sync: false # se escribe a mano en el panel de Render
+      - key: PAYMENT_LINKS
+        sync: false # el JSON de los links, en una sola línea (ver README)
+      - key: HEADLESS
+        value: "true"
+      - key: LOG_UPDATES
+        value: "false"
