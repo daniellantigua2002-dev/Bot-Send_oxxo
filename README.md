@@ -138,29 +138,13 @@ Cada falla guarda una captura en `debug/`. Para que no se acumulen, **cada domin
 
 ## Despliegue en Render
 
-Render con Playwright necesita Docker (el entorno normal no puede instalar Chromium). El repo ya trae `Dockerfile` (imagen oficial de Playwright con Chromium) y `render.yaml`.
 
 Se despliega como **Web Service** en el **plan gratis**. Ese plan exige un puerto abierto, por eso el bot arranca también un pequeño servidor de salud (`src/servidor.ts`) que escucha en `PORT` (10000 por defecto) y responde `200 OK` en `/`. Render lo usa como health check (`healthCheckPath: /`).
 
-1. Sube el repo a GitHub.
-2. En Render crea un **Web Service** (plan **Free**) conectado al repo, o usa el *Blueprint* (`render.yaml`) y Render lo configura solo.
-3. En **Environment**, define las variables: `BOT_TOKEN`, `ALLOWED_GROUP_ID` y `PAYMENT_LINKS` (el JSON de los links en una sola línea). `HEADLESS=true`. (`PORT` lo pone Render solo.)
-4. Apaga el bot de tu PC antes de dejar corriendo el del servidor: Telegram solo permite un bot leyendo a la vez (dos darían error `409`).
 
-En los logs verás `Página de salud en el puerto 10000` y luego `Your service is live 🎉`.
+> **Límites del plan gratis:** 512 MB de RAM (Chromium puede quedarse corto al generar un OXXO) y el servicio se duerme tras ~15 min sin tráfico. 
 
-> **Límites del plan gratis:** 512 MB de RAM (Chromium puede quedarse corto al generar un OXXO) y el servicio se duerme tras ~15 min sin tráfico. Para uso real conviene un plan de pago o un servidor propio.
-
-Para sacar el JSON de una línea desde tu archivo local:
-
-```bash
-node -e "process.stdout.write(JSON.stringify(require('./data/paymentLinks.json')))"
-```
-
-Copia lo que imprime y pégalo tal cual en el valor de `PAYMENT_LINKS` en Render.
 
 > Si cambian los links, actualiza `PAYMENT_LINKS` en Render y reinicia el servicio.
 
-## Seguridad
 
-Si el token llega a publicarse por error, genera uno nuevo en @BotFather con `/revoke`. Borrar el commit no basta, porque el token queda en el historial de git.
